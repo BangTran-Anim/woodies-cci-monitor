@@ -1,0 +1,28 @@
+
+name: Test Binance Data
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Binance API
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.request
+
+          url = (
+              "https://data-api.binance.vision"
+              "/api/v3/klines"
+              "?symbol=BTCUSDT&interval=5m&limit=3"
+          )
+
+          with urllib.request.urlopen(url, timeout=20) as r:
+              data = json.load(r)
+              print("HTTP: 200")
+              print("Candles:", len(data))
+              print("Close:", data[0][4])
+          PY
