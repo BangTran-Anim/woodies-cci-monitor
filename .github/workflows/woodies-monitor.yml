@@ -1,0 +1,28 @@
+name: Woodies CCI Scanner
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 02, 07, 12, ... UTC. GitHub can delay or skip scheduled runs.
+    - cron: '2-59/5 * * * *'
+
+permissions:
+  contents: read
+
+# Ensure scheduled and manual jobs do not overlap: one writer for D1 checkpoints.
+concurrency:
+  group: woodies-cci-scan
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      WORKER_URL: https://woodies-cci-bot.tcb-trancaobang.workers.dev
+      SYNC_KEY: ${{ secrets.SYNC_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Scan Binance and sync Cloudflare
+        run: python3 scan_binance.py
